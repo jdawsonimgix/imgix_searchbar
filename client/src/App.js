@@ -1,16 +1,19 @@
 import "./App.css";
 import React, { useState, useEffect } from "react";
+import Imgix from "react-imgix";
 import axios from "axios";
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
-  const [searchArray, setSearchArray] = useState();
+  const [searchArray, setSearchArray] = useState([]);
 
   useEffect(() => {}, [searchArray]);
 
   const getMovies = async (sentSearchTerm) => {
     let searchAxios = await axios
-      .get("http://localhost:5001/searching")
+      .post("http://localhost:5001/searching", {
+        sendToBackend: sentSearchTerm,
+      })
       .then(function (response) {
         return response;
       })
@@ -21,11 +24,6 @@ function App() {
 
     console.log(searchAxios.data);
     setSearchArray(searchAxios.data);
-    // console.log(searchAxios.data.data);
-    // console.log(console.log(searchAxios.data.data.length));
-
-    // console.log(searchAxios.data.data[0].attributes.origin_path);
-    // tempArray.push(searchAxios.data.data[0].attributes.origin_path);
   };
 
   const handleOnSubmit = (e) => {
@@ -40,15 +38,12 @@ function App() {
     setSearchTerm(e.target.value);
   };
 
-  const testReturnResult = () => {
-    console.log(searchArray);
-  };
-
   return (
     <div className='App'>
       <header className='App-header'>
-        <button onClick={testReturnResult}>test</button>
-        <h1>search</h1>
+        <h1>Search Bar using imgix Management API</h1>
+        <h4>Test out the search feature by searching for tags. </h4>
+        <h4>Search suggestions: cup, t-shirt, and graphics</h4>
         <form onSubmit={handleOnSubmit}>
           <input
             className='search'
@@ -58,6 +53,14 @@ function App() {
             onChange={handleOnChange}
           />
         </form>
+        {searchArray.map((value, index) => (
+          <Imgix
+            src={"https://ix-shop.imgix.net" + value}
+            width={100} // This sets what resolution the component should load from the CDN and the size of the resulting image
+            height={100}
+            key={index}
+          />
+        ))}
       </header>
     </div>
   );
